@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+</head>
+<body>
+    <h2>YouTube Downloader</h2>
+    <input type="text" id="videoUrl" placeholder="YouTubeのURLを入力">
+    <button onclick="downloadVideo()">ダウンロード</button>
+    <p id="status"></p>
+    <a id="downloadLink" href="#" style="display:none;">ダウンロードリンク</a>
+
+    <script>
+        async function downloadVideo() {
+            const url = document.getElementById("videoUrl").value;
+            const status = document.getElementById("status");
+            const link = document.getElementById("downloadLink");
+
+            if (!url) {
+                status.innerText = "URLを入力してください";
+                return;
+            }
+
+            status.innerText = "ダウンロード中...";
+
+            const response = await fetch("/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                link.href = result.download_url;
+                link.style.display = "block";
+                link.innerText = "ダウンロードはこちら";
+                status.innerText = "ダウンロード完了";
+            } else {
+                status.innerText = "エラー: " + result.error;
+            }
+        }
+    </script>
+</body>
+</html>
